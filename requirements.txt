@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+httpx
+aiocache
+python-dotenv
+pydantic
+prometheus-client
+loguru
+pytest
+locust
