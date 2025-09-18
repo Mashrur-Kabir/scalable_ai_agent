@@ -2,11 +2,14 @@
 
 ## System Architecture Diagram:
 
-![system_architecture.png](system_architecture.png)
+![system_architecture](Extra_files/system_architecture.png)
 
 ## Purpose and Functionalities:
 -This AI agent analyzes research papers by summarizing uploaded or provided text using Groq's llama-3.1-70b-instant model. Key features:
--High Concurrency Handling: Supports more than 10,000 concurrent requests on limited hardware --> [results](Load_testing_results.pdf)
+-High Concurrency Handling: Supports more than 10,000 concurrent requests on limited hardware -->
+
+[test_results](Extra_files/Load_testing_results.pdf)
+
 -Async Processing: Uses FastAPI’s async capabilities, batching, and task queues for efficiency.
 -Caching: aiocache and lru_cache minimize repeated inference calls.
 -Monitoring: Logs request latencies and throughput.
@@ -26,7 +29,7 @@
 
 📌**To simulate thousands of concurrent users hitting the system, Locust is used. It helps you check how well your system performs and scales under heavy load.**
 
-![Locust_UI](<Locust for load test.png>)
+![Locust_UI](<Extra_files/Locust for load test.png>)
 
 **Trade-offs**
 -Limited Hardware: We balance worker count and batch size for latency and throughput.
@@ -40,32 +43,27 @@ Prerequisites:
 -Python 3.11+
 -Groq API Key
 
-1. Clone the repository:
+## 1. Clone the repository:
+    git clone https://github.com/your-username/scalable-fastapi-agent.git
+    cd scalable-fastapi-agent
 
-git clone https://github.com/your-username/scalable-fastapi-agent.git
-cd scalable-fastapi-agent
+## 2. Create .env following the .env.example:
+    GROQ_API_KEY=your_groq_api_key_here
 
-2. Create .env following the .env.example:
+## 3. Install dependencies:
+    pip install -r requirements.txt
 
-GROQ_API_KEY=your_groq_api_key_here
+## 4. Run the server:
+    uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-3. Install dependencies:
-
-pip install -r requirements.txt
-
-4. Run the server:
-
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-5. Test the endpoint:
-
-curl -X POST "http://127.0.0.1:8000/analyze" -H "Content-Type: application/json" -d '{"text": "Sample research paper content."}'
+## 5. Test the endpoint:
+    curl -X POST "http://127.0.0.1:8000/analyze" -H "Content-Type: application/json" -d '{"text": "Sample research paper content."}'
 
 ## **RUNNING WITH DOCKER**:----------------------
 
 -Build and Run:
 
-docker-compose up --build
+    docker-compose up --build
 
 -Access:
 
@@ -75,7 +73,7 @@ Visit: http://localhost:8000/docs
 POST: /analyze (Submit text for research analysis.)
 GET: /status (Check service health and stats.)
 
-📌 Expected results and next steps:----------------
+📌 **Expected results and next steps:**----------------
 
 The "/analyze" API generated a unique request_id (7b1a2367...). This ID is what your system uses to track the processing job.
 
@@ -99,7 +97,7 @@ Once processed, you should see the final status change to something like "done" 
 
 -!!!Scale workers if needed to increase load generation:
 
-docker-compose up --scale locust-worker=4 -d
+    docker-compose up --scale locust-worker=4 -d
 
 This spins up four workers connected to the same master.
 
@@ -111,22 +109,22 @@ This spins up four workers connected to the same master.
 
 -In another terminal (on your host machine):
 
-locust -f locustfile.py --host http://127.0.0.1:8000
+    locust -f locustfile.py --host http://127.0.0.1:8000
 
 -Open Locust Web UI at http://localhost:8089 and configure:
     -Number of users: e.g., 10000
     -Spawn rate: e.g., 500 (users per second)
     -Run the test and observe metrics such as average latency, p95 latency, throughput, and failures.
 
-## ✅ Tips for Testing more Concurrent Requests:
+## Tips for Testing more Concurrent Requests:
 
-    -Use multiple Locust workers in distributed mode:
+-Use multiple Locust workers in distributed mode:
 
-# Start master
-locust -f locustfile.py --host http://127.0.0.1:8000 --master
+    # Start master-
+        locust -f locustfile.py --host http://127.0.0.1:8000 --master
 
-# Start workers (run in separate terminals or machines)
-locust -f locustfile.py --worker --master-host=127.0.0.1
+    # Start workers (run in separate terminals or machines)-
+        locust -f locustfile.py --worker --master-host=127.0.0.1
 
-    -Gradually ramp up users to avoid overwhelming your machine.
-    -Monitor memory/CPU usage with htop or Docker stats to validate optimizations.
+-Gradually ramp up users to avoid overwhelming your machine.
+-Monitor memory/CPU usage with htop or Docker stats to validate optimizations.
